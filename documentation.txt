@@ -1,0 +1,24 @@
+national coord
+state coord
+lga cord (ict people)
+cluster chairmen
+
+super admin for all who regiter
+every state should upload
+when uploading....must upload base
+cluster code (unique for each cluster) and state, username = email.
+email 
+
+
+generate bank schedule( export some fields; bank code, account name, account number, BVN, payment reference) condition: if bvn is duplicate, remove duplicate
+
+
+change password
+a login page
+uploading
+
+
+
+for any Admin
+username: admin001@admin001.com
+password: admin001
