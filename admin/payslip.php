@@ -3,6 +3,7 @@
 include('includes/config.php');
 //php_spreadsheet_export.php
 include '../vendor/autoload.php';
+
 error_reporting();
 $name = 'GRANT/';
 date_default_timezone_set("Africa/Lagos");
@@ -17,61 +18,61 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 if (!$user->admin_is_logged_in()) {
   header('Location: admin.php');
 }
-if (isset($_POST['state'])) {
-
+if (isset($_POST['generate'])) {
   $state = $_POST['state'];
-  $transID = "$name" . "$state" . "/" . "$month" . "$year";
-  $query = "SELECT *,banklog.BankName  FROM users INNER JOIN banklog ON users.BankName = banklog.BankName WHERE users.state='" . $state . "'";
-  $statement = $db->prepare($query);
-  $statement->execute();
-  $result = $statement->fetchAll();
+}
+global $state;
+$transID = "$name" . "$state" . "/" . "$month" . "$year";
+$query = "SELECT *,banklog.BankName  FROM users INNER JOIN banklog ON users.BankName = banklog.BankName WHERE users.state='" . $state . "'";
+$statement = $db->prepare($query);
+$statement->execute();
+$result = $statement->fetchAll();
+if (isset($_POST["export"])) {
+  $file = new Spreadsheet();
+  $active_sheet = $file->getActiveSheet();
+  $active_sheet->setCellValue('A1', 'TRANSACTION ID');
+  $active_sheet->setCellValue('B1', 'Full Name');
+  $active_sheet->setCellValue('C1', 'Amount');
+  $active_sheet->setCellValue('D1', 'Date');
+  $active_sheet->setCellValue('E1', 'S/N');
+  $active_sheet->setCellValue('F1', 'Account Numnber');
+  $active_sheet->setCellValue('G1', 'Sort Code');
+  $active_sheet->setCellValue('H1', 'Bank Name');
 
-  if (isset($_POST["export"])) {
-    $file = new Spreadsheet();
+  $count = 2;
 
-    $active_sheet = $file->getActiveSheet();
-    $active_sheet->setCellValue('A1', 'TRANSACTION ID');
-    $active_sheet->setCellValue('B1', 'Full Name');
-    $active_sheet->setCellValue('C1', 'Amount');
-    $active_sheet->setCellValue('D1', 'Date');
-    $active_sheet->setCellValue('E1', 'S/N');
-    $active_sheet->setCellValue('F1', 'Account Numnber');
-    $active_sheet->setCellValue('G1', 'Sort Code');
+  foreach ($result as $row) {
 
-    $count = 2;
-
-    foreach ($result as $row) {
-
-      $active_sheet->setCellValue('A' . $count, $transID);
-      $active_sheet->setCellValue('B' . $count, $row["fullName"]);
-      $active_sheet->setCellValue('C' . $count, $row["Amount"]);
-      $active_sheet->setCellValue('D' . $count, $date);
-      $active_sheet->setCellValue('E' . $count, ++$num);
-      $active_sheet->setCellValue('F' . $count, $row["AccountNumber"]);
-      $active_sheet->setCellValue('G' . $count, $row["SortCode"]);
-
-
-      $count = $count + 1;
-    }
-
-    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($file, $_POST["file_type"]);
-
-    $file_name = time() . '.' . strtolower($_POST["file_type"]);
-
-    $writer->save($file_name);
-
-    header('Content-Type: application/x-www-form-urlencoded');
-
-    header('Content-Transfer-Encoding: Binary');
-
-    header("Content-disposition: attachment; filename=\"" . $file_name . "\"");
-
-    readfile($file_name);
-
-    unlink($file_name);
-
-    exit;
+    $active_sheet->setCellValue('A' . $count, $transID);
+    $active_sheet->setCellValue('B' . $count, $row["fullName"]);
+    $active_sheet->setCellValue('C' . $count, $row["Amount"]);
+    $active_sheet->setCellValue('D' . $count, $date);
+    $active_sheet->setCellValue('E' . $count, ++$num);
+    $active_sheet->setCellValue('F' . $count, $row["AccountNumber"]);
+    $active_sheet->setCellValue('G' . $count, $row["BankCode"]);
+    $active_sheet->setCellValue('H' . $count, $row["BankName"]);
+    $count = $count + 1;
   }
+
+  $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($file, $_POST["file_type"]);
+
+  $file_name = time() . '.' . strtolower($_POST["file_type"]);
+
+  $writer->save($file_name);
+
+  header('Content-Type: application/x-www-form-urlencoded');
+
+  header('Content-Transfer-Encoding: Binary');
+
+  header("Content-disposition: attachment; filename=\"" . $file_name . "\"");
+
+  readfile($file_name);
+
+  unlink($file_name);
+
+  exit;
+}
+
 
 ?>
 <!DOCTYPE html>
@@ -84,7 +85,7 @@ if (isset($_POST['state'])) {
 </head>
 
 <body>
-  <?php include('includes/navbar.html'); 
+  <?php include('includes/navbar.html');
   ?>
   <div class="container" style="margin-top: 50px;">
     <br />
@@ -92,58 +93,20 @@ if (isset($_POST['state'])) {
     <br />
     <div class="panel panel-default">
       <div class="panel-heading">
+        <form name="state" action="" method="POST">
+          <div class="col-md-4">
+
+           
+          </div>
+          <div class="col-md-2">
+            
+          </div>
+        </form>
+
+
+
         <form method="POST">
           <div class="row">
-
-
-            <form action="" method="POST">
-              <div class="col-md-4">
-
-                <select name="state" class="form-control input-sm">
-                  <option disabled selected>-- Select State --</option>
-                  <option value="Abia">Abia</option>
-                  <option value="Adamawa">Adamawa</option>
-                  <option value="Akwa Ibom">Akwa Ibom</option>
-                  <option value="Anambra">Anambra</option>
-                  <option value="Bauchi">Bauchi</option>
-                  <option value="Bayelsa">Bayelsa</option>
-                  <option value="Benue">Benue</option>
-                  <option value="Borno">Borno</option>
-                  <option value="Cross Rive">Cross River</option>
-                  <option value="Delta">Delta</option>
-                  <option value="Ebonyi">Ebonyi</option>
-                  <option value="Edo">Edo</option>
-                  <option value="Ekiti">Ekiti</option>
-                  <option value="Enugu">Enugu</option>
-                  <option value="FCT">Federal Capital Territory</option>
-                  <option value="Gombe">Gombe</option>
-                  <option value="Imo">Imo</option>
-                  <option value="Jigawa">Jigawa</option>
-                  <option value="Kaduna">Kaduna</option>
-                  <option value="Kano">Kano</option>
-                  <option value="Katsina">Katsina</option>
-                  <option value="Kebbi">Kebbi</option>
-                  <option value="Kogi">Kogi</option>
-                  <option value="Kwara">Kwara</option>
-                  <option value="Lagos">Lagos</option>
-                  <option value="Nasarawa">Nasarawa</option>
-                  <option value="Niger">Niger</option>
-                  <option value="Ogun">Ogun</option>
-                  <option value="Ondo">Ondo</option>
-                  <option value="Osun">Osun</option>
-                  <option value="Oyo">Oyo</option>
-                  <option value="Plateau">Plateau</option>
-                  <option value="Rivers">Rivers</option>
-                  <option value="Sokoto">Sokoto</option>
-                  <option value="Taraba">Taraba</option>
-                  <option value="Yobe">Yobe</option>
-                  <option value="Zamfara">Zamfara</option>
-                </select>
-              </div>
-              <div class="col-md-2">
-                <input type="submit" value="Generate" class="btn btn-primary btn-sm" />
-              </div>
-            </form>
             <div class="col-md-4">
               <select name="file_type" class="form-control input-sm">
                 <option disabled selected>File Type</option>
@@ -158,6 +121,19 @@ if (isset($_POST['state'])) {
           </div>
         </form>
       </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
       <div class="panel-body">
         <div class="table-responsive">
           <table class="table table-striped table-bordered">
@@ -169,17 +145,17 @@ if (isset($_POST['state'])) {
               <th>S/N</th>
               <th>Account Number</th>
               <th>Sort Code</th>
-              <th>BankName</th>
+              <th>Bank Name</th>
 
             </tr>
             <?php
 
-           /*  if ($_SERVER['REQUEST_METHOD'] ==  'POST') {
-              $state = $_POST['state']; 
+            if (isset($_POST['generate'])) {
+              $state = $_POST['state'];
               $query = "SELECT *,banklog.BankName  FROM users INNER JOIN banklog ON users.BankName = banklog.BankName WHERE users.state='" . $state . "'";
               $statement = $db->prepare($query);
               $statement->execute();
-              $result = $statement->fetchAll(); */
+              $result = $statement->fetchAll();
               foreach ($result as $row) {
 
                 echo '
@@ -190,18 +166,18 @@ if (isset($_POST['state'])) {
                     <td>' . $date . '</td>
                     <td>' . ++$num . '</td>
                     <td>' . $row["AccountNumber"] . '</td>
-                    <td>' . $row["SortCode"] . '</td>
+                    <td>' . $row["BankCode"] . '</td>
                     <td>' . $row["BankName"] . '</td>
                     
                   </tr>
                   ';
               }
-              <
-           /*  } */
+            }
 
             ?>
 
           </table>
+
         </div>
       </div>
     </div>

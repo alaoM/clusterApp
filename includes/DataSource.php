@@ -20,21 +20,21 @@ class DataSource
 
     // PHP 7.1.0 visibility modifiers are allowed for class constants.
     // when using above 7.1.0, declare the below constants as private
-    /* const HOST = 'localhost';
+    const HOST = 'localhost';
 
     const USERNAME = 'zetharsk_import';
 
     const PASSWORD = 'gg2m+8:8MCsMY3';
 
-    const DATABASENAME = 'zetharsk_import'; */
+    const DATABASENAME = 'zetharsk_import';
 
-    const HOST = 'localhost';
+    /* const HOST = 'localhost';
 
     const USERNAME = 'root';
 
     const PASSWORD = '';
 
-    const DATABASENAME = 'import_csv';
+    const DATABASENAME = 'import_csv'; */
 
     private $conn;
 

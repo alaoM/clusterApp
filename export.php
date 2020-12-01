@@ -87,7 +87,7 @@ if (isset($_POST["export"])) {
 </head>
 
 <body>
-<?php// include('includes/navbar.html');?>
+<?php include('includes/navbar.html');?>
   <div class="container" style="margin-top: 50px;" >
     <br />
     <h3 align="center">Export All Record from Database</h3>
